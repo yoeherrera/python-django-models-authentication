@@ -1,18 +1,17 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Blog
+{{ tag }}
 {% endblock %}
 
 {% block content %}
-        <div class="row">
-            <div class="col-lg-6">
-                {% for tag in tags %}
-                <a href="{{tag.get_absolute_url}}"><span class="label label-primary">{{tag.name}}</span></a>
-                {% endfor %}
-            </div><!-- /.col-lg-6 -->
-        </div>     
-        
+
+      <div class="row">
+        <div class="col-lg-6">
+          <h1>Posts about {{tag}}</h1>
+        </div>
+      </div>
+
       <!-- Example row of columns -->
       {% for post in posts %}
       <div class="row">
@@ -22,4 +21,5 @@ Blog
             </div><!-- /.col-lg-6 -->
       </div>         
       {% endfor %}
+      
 {% endblock %}
