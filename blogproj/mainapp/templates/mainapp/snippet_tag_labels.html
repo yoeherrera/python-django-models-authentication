@@ -1,5 +1,5 @@
 {% for tag in tags %}
 <a href="{{tag.get_absolute_url}}">
-    <span class="label label-primary">{{tag.name}}</span>
+    <span class="card-author-link">{{tag.name}}{% if not forloop.last %}, {% endif %}</span>
 </a>
 {% endfor %}
