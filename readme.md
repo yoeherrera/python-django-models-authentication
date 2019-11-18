@@ -13,14 +13,14 @@ Install python3 per your OS instructions.
 
 # Run server
 
-python blogproj/manage.py runserver
+`python manage.py runserver`
 
 
 # Create a user account.
 
 Run the create super user command and follow terminal insctructions.
 
-`python blogproj/manage.py createsuperuser`
+`python manage.py createsuperuser`
 
 
 # Create some content
@@ -32,3 +32,6 @@ http://localhost:8000/admin
 
 http://localhost:8000
 
+# Run tests by using Django Test on the module folders
+
+`python manage.py test module1`

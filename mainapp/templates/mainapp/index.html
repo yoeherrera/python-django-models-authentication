@@ -5,27 +5,7 @@ Blog
 {% endblock %}
 
 {% block content %}
-    
-    <!--<div class="row">
-      <div class="col-lg-6">
-        {% include 'mainapp/snippet_tag_labels.html' %}            
-      </div>
-    </div>     -->
-    <div class="row">
-    {% for post in posts %}
-                 
-        <div class="col-sm-4 py-2 box-shadow">
-          <a href="{{post.get_absolute_url}}">
-          <img class="card-img-top" src="https://picsum.photos/id/{{post.id}}/500/350" alt="{{post.title}}">
-          <div class="card-body">
-            <div class="card-title">{{post.title}}</div>
-            <p class="card-text">
-            {{post.body|truncatewords:"30"}}
-            </p>
-            <div class="card-subtext"><a href="{{post.author.get_absolute_url}}" class="">{{post.author.username}}</a></div>
-          </div></a>
-      </div>
-    {% endfor %}
-
-    </div>
+  <h3> Latest Posts </h3>
+  
+  {% include 'mainapp/snippet_post_list.html' %}
 {% endblock %}

@@ -4,20 +4,9 @@
 {{ title }}
 {% endblock %}
 
+
 {% block content %}
-
-      <div class="row">
-        <div class="col-lg-6">
-          <h1>{{ title }}</h1>
-        </div>
-      </div>
-
-      {% for post in posts %}
-      <div class="row">
-        <div class="col-lg-6">
-          {% include 'mainapp/snippet_post_link.html' %}
-        </div>
-      </div>         
-      {% endfor %}
-      
+  <h3> {{title}}</h3>
+  
+  {% include 'mainapp/snippet_post_list.html' %}
 {% endblock %}
