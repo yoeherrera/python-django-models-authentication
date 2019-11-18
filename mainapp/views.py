@@ -1,30 +1,34 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import BlogPost, Tag
+from django.shortcuts import render
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.http import Http404
+
+from datetime import datetime
+ALL_POSTS = [
+ {
+    'id':0,
+    'author': {'username':'will', 'id':'1'},
+    'title':'My first blog post',
+    'body': 'This is my first post. I hope you like it.',
+    'postdate': datetime(2019, 10, 1),
+    'get_absolute_url': '/blog/post/0'
+ },
+ {
+    'id':1,
+    'author': {'username':'will', 'id':'1'},
+    'title':'My second blog post',
+    'body': 'I\'ve got tons of these now. This is fun.',
+    'postdate': datetime(2019, 10, 2),
+    'get_absolute_url': '/blog/post/1'
+ },
+]
 
 def index(request):
-    posts = BlogPost.objects.all()
-    tags = Tag.objects.all()
-    return render(request, 'mainapp/index.html', {'posts':posts, 'tags':tags})
+    posts = ALL_POSTS
+    return render(request, 'mainapp/index.html', {'posts':posts})
 
 def post(request, id):
-    post = get_object_or_404(BlogPost, pk=id)
-    return render(request, 'mainapp/post.html', {'object': post})
-
-def tag_posts(request, name):
-    name = name.lower()
     try:
-        tag = Tag.objects.get(name=name)
-        posts = tag.posts.all()
-    except:
-        posts = []
-    title = "Posts about {}".format(name)
-
-    return render(request, 'mainapp/filtered_post_list.html', {'posts':posts, 'title':title})
-
-def user_posts(request, id):
-    user = get_object_or_404(get_user_model(), pk=id)
-    title = "Posts by {}".format(user.username)
-    user_post_list = user.posts.all()
-    return render(request, 'mainapp/filtered_post_list.html', {'posts':user_post_list, 'title':title})
+        post = ALL_POSTS[id]
+    except IndexError:
+        raise Http404("Post does not exist")
+    return render(request, 'mainapp/post.html', {'object': post})
