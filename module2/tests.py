@@ -9,7 +9,7 @@ from django.db.models.fields import CharField, DateTimeField, TextField
 import users
 import sys
 
-class PostTestCast(SimpleTestCase):
+class PostTestCase(SimpleTestCase):
     def test_settings_import(self):
         modulename = 'django.conf'
         self.assertTrue(modulename in sys.modules)
