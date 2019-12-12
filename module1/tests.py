@@ -26,9 +26,19 @@ class UsersTestCase(SimpleTestCase):
 
     def test_task4_create_model(self):
         import_found = False
+        user_class_found = False
+        user_base_class_found = False
         for x in load_ast_tree('users/models.py').body:
             if type(x) is ast.ImportFrom:
                 if x.module == 'django.contrib.auth.models' and x.names[0].name == 'AbstractUser':
                     import_found = True
+            if type(x) is ast.ClassDef:
+                if x.name == 'User':
+                    user_class_found = True
+                if len(x.bases) and x.bases[0].id == 'AbstractUser':
+                    user_base_class_found = True
+
         self.assertTrue(import_found, msg="Did you import `AbstractUser`?")
+        self.assertTrue(user_class_found, "Did you create the `User` class?")
+        self.assertTrue(user_base_class_found, "Did you derive the `User` class from `AbstractUser`?")
 
