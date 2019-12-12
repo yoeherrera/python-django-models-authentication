@@ -15,7 +15,7 @@ class PostTestCase(SimpleTestCase):
         self.assertTrue(modulename in sys.modules)
         self.assertTrue(type(mainapp_models.settings) == LazySettings)
 
-    def test_post_model_exists(self):
+    def test_post_model_exists(self):        
         self.assertTrue( 'BlogPost' in dir(mainapp_models) and
                         type(mainapp_models.BlogPost) == ModelBase)
 
