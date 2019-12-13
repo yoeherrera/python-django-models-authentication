@@ -30,6 +30,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# SILENCED_SYSTEM_CHECKS should be set to an empty list once the 
+# custom user model is setup. This is only added to support testing.
+SILENCED_SYSTEM_CHECKS = ['fields.E304'] 
 
 # Application definition
 
