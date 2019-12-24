@@ -184,7 +184,3 @@ Call `admin.site.register()` with `User` and `UserAdmin` as parameters."""
         self.assertTrue(os.path.isdir('users/migrations/'), msg=msg)
         self.assertTrue(os.path.isfile('users/migrations/0001_initial.py'), msg=msg)
         
-
-    def test_task11_create_user(self):
-        "Not possible to test user creation remotely since database is stored locally."
-        pass
