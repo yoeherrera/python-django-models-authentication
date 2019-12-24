@@ -11,11 +11,12 @@ def load_ast_tree(filename):
 
 class UsersTestCase(SimpleTestCase):
     def test_task1_createapp(self):
-        self.assertTrue(os.path.isdir('users'), msg="Did you use `manage.py createapp` to start the `users` app?")
-        self.assertTrue(os.path.isfile('users/admin.py'), msg="Did you use `manage.py createapp` to start the `users` app?")
-        self.assertTrue(os.path.isfile('users/apps.py'), msg="Did you use `manage.py createapp` to start the `users` app?")
-        self.assertTrue(os.path.isfile('users/models.py'), msg="Did you use `manage.py createapp` to start the `users` app?")
-        self.assertTrue(os.path.isfile('users/views.py'), msg="Did you use `manage.py createapp` to start the `users` app?")
+        msg = "Did you use `manage.py createapp` to start the `users` app?"
+        self.assertTrue(os.path.isdir('users'), msg=msg)
+        self.assertTrue(os.path.isfile('users/admin.py'), msg=msg)
+        self.assertTrue(os.path.isfile('users/apps.py'), msg=msg)
+        self.assertTrue(os.path.isfile('users/models.py'), msg=msg)
+        self.assertTrue(os.path.isfile('users/views.py'), msg=msg)
 
     def test_task2_add_settings(self):
         self.assertIn('users', settings.INSTALLED_APPS, msg="Check if users app is in INSTALLED_APPS")
@@ -144,3 +145,46 @@ Call `admin.site.register()` with `User` and `UserAdmin` as parameters."""
                 """    path('logout/', auth_views.LogoutView.as_view(next_page='index' ), name='logout'),"""
                 logout_path_found = True
         return login_path_found, logout_path_found
+    
+    def test_task8_redirect_routes(self):
+        """In `blogproj/urls.py`, add `path('accounts/', include('users.urls')),` 
+        as the first entry in the `urlpatterns` array."""
+        try:
+            urls_ast = load_ast_tree('blogproj/urls.py').body
+        except FileNotFoundError:
+            self.fail("Is the `urls.py` file missing?")
+
+        users_path_found = False
+
+        try:
+            for x in urls_ast:
+                if type(x) is ast.Assign and x.targets[0].id == 'urlpatterns':
+                    routes = x.value.elts
+                    for entry in routes:
+                        if (entry.func.id == 'path' and 
+                            entry.args[0].value == 'accounts/' and 
+                            entry.args[1].func.id == 'include' and 
+                            entry.args[1].args[0].value == 'users.urls'):
+                                users_path_found = True
+        except:
+            # Catch any bad things that happened above and fail the test.
+            pass
+
+        self.assertTrue(users_path_found,  "Did you `include` the users project URLS? in `blogproj/urls.py`?") 
+
+    def test_task9_update_site_templates(self):
+        response = self.client.get('/blog/')
+
+        self.assertContains(response, 'navbar-nav', msg_prefix="Check that the navbar is still in the `base.html` template")
+        self.assertContains(response, 'nav-link', msg_prefix="Check that you removed the `comment` and `uncomment` tags from `base.html`")
+        self.assertContains(response, 'Login', msg_prefix="Check that you removed the `comment` and `uncomment` tags from `base.html`")
+
+    def test_task10_make_migrations(self):
+        msg = "Did you use `manage.py makemigrations` to create the `users` migrations file? Don't forget to `add` it to the git repo."
+        self.assertTrue(os.path.isdir('users/migrations/'), msg=msg)
+        self.assertTrue(os.path.isfile('users/migrations/0001_initial.py'), msg=msg)
+        
+
+    def test_task11_create_user(self):
+        "Not possible to test user creation remotely since database is stored locally."
+        pass
