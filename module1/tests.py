@@ -1,15 +1,9 @@
-from django.test import SimpleTestCase
+from support.SimplerTestCase import SimplerTestCase
 from django.conf import LazySettings
 from django.conf import settings
-
 import os, ast
 
-def load_ast_tree(filename):
-    with open(filename) as f:
-        fstr = f.read()
-    return ast.parse(fstr, filename=filename)
-
-class UsersTestCase(SimpleTestCase):
+class UsersTestCase(SimplerTestCase):
     def test_task1_createapp(self):
         msg = "Did you use `manage.py createapp` to start the `users` app?"
         self.assertTrue(os.path.isdir('users'), msg=msg)
@@ -29,7 +23,7 @@ class UsersTestCase(SimpleTestCase):
         import_found = False
         user_class_found = False
         user_base_class_found = False
-        for x in load_ast_tree('users/models.py').body:
+        for x in self.load_ast_tree('users/models.py').body:
             if type(x) is ast.ImportFrom:
                 if x.module == 'django.contrib.auth.models' and x.names[0].name == 'AbstractUser':
                     import_found = True
@@ -55,7 +49,7 @@ Call `admin.site.register()` with `User` and `UserAdmin` as parameters."""
         admin_site_register_found = False
 
         try:
-            for x in load_ast_tree('users/admin.py').body:
+            for x in self.load_ast_tree('users/admin.py').body:
                 if type(x) is ast.ImportFrom:
                     if x.module == 'django.contrib.auth.admin' and x.names[0].name == 'UserAdmin':
                         import_user_admin_found = True
@@ -83,7 +77,7 @@ Call `admin.site.register()` with `User` and `UserAdmin` as parameters."""
 
     def test_task7_setup_urls(self):
         try:
-            urls_ast = load_ast_tree('users/urls.py').body
+            urls_ast = self.load_ast_tree('users/urls.py').body
         except FileNotFoundError:
             self.fail("Did you create the `urls.py` file?")
 
@@ -150,7 +144,7 @@ Call `admin.site.register()` with `User` and `UserAdmin` as parameters."""
         """In `blogproj/urls.py`, add `path('accounts/', include('users.urls')),` 
         as the first entry in the `urlpatterns` array."""
         try:
-            urls_ast = load_ast_tree('blogproj/urls.py').body
+            urls_ast = self.load_ast_tree('blogproj/urls.py').body
         except FileNotFoundError:
             self.fail("Is the `urls.py` file missing?")
 

@@ -1,12 +1,12 @@
 ---
-% Django Models - Blog Posts Module
+% Django Models - Blog Posts Model
 % Will Holderness
 ---
 
 
 # Create Model class
 
-Create BlogPost Model by adding a new class into `mainapp/models.py`. Name the class `BlogPost` and make it extend `models.Model`. In the class body, add field called `title` and set it to `models.CharField()`. Pass `max_length` of `200` to the `CharField` method.
+Create the blog post model by adding a new class into `mainapp/models.py`. Name the class `BlogPost` and make it extend `models.Model`. In the class body, add a field called `title` and set it to `models.CharField()`. Pass it a `max_length` of `200`.
 
 ```python
 class BlogPost(models.Model):
@@ -17,7 +17,7 @@ class BlogPost(models.Model):
 
 To add the foreign key, we need to know which user model is in use. This is stored in the Django setting called `AUTH_USER_MODEL`. Lets first import those settings.
 
-Add `from  django.conf  import  settings` to the top of the file. Then in the body of our `BlogPost` class, add a new field called `author` with type of `models.ForeignKey()`. Pass the following parameters to `ForeignKey()`: `model=settings.AUTH_USER_MODEL`, `related_name="posts"`, and `on_delete=models.CASCADE`.
+Add `from  django.conf  import  settings` to the top of the file. Then in the body of our `BlogPost` class, add a new field called `author` with type of `models.ForeignKey()`. Pass the following parameters to `ForeignKey()`: `settings.AUTH_USER_MODEL`, `related_name="posts"`, and `on_delete=models.CASCADE`.
     
 ```python
 author = models.ForeignKey(
@@ -47,7 +47,7 @@ def str(self):
 
 # Add url reverser.
 
-Having a `get_absolute_url` function lets Django determine the canonical URL for a given model. This will come in handy in our views. First we need to import the `reverse` helper function from `django.urls` at the top of the file. `from django.urls import reverse`. Next add a method in the class called `get_absolute_url` that takes the `self` parameter. The method should contain the following line: `return reverse('post', args=[str(self.id)])`
+Having a `get_absolute_url` function lets Django determine the canonical URL for a given model. This will come in handy in our views. First we need to import the `reverse` helper function from `django.urls` at the top of the file. Next add a method in the class called `get_absolute_url` that takes the `self` parameter. The method should contain the following line: `return reverse('post', args=[str(self.id)])`
 
 ```python
 def get_absolute_url(self):
@@ -66,7 +66,7 @@ admin.site.register(BlogPost)
 
 # Update index view to use model
 
-Now we need to update `mainapp/views.py` to include our new `BlogPost` model. First lets import the model with `import BlogPost model from .models`. Also import the `get_object_or_404` method from `django.shortcuts` with `import get_object_or_404 method from django.shortcuts`. 
+Now we need to update `mainapp/views.py` to include our new `BlogPost` model. First let's import the `BlogPost` model from `.models`. Also import the `get_object_or_404` method from `django.shortcuts`.
 
 Next in the `index` method, set the `posts` variable to `BlogPosts.objects.all()` instead of `ALL_POSTS`.
 
