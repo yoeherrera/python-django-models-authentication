@@ -16,6 +16,11 @@ class PostTestCase(SimplerTestCase):
             self.author_on_delete_found = False
             self.author_related_name_found = False
             self.body_field_found = False
+            self.postdate_field_found = False
+            self.postdate_auto_now_found = False
+            self.postdata_blank_found = False
+            self.str_method_found = False
+            self.get_abs_url_found = False
 
             self.check_model_file()
 
@@ -67,9 +72,40 @@ class PostTestCase(SimplerTestCase):
                                     y.value.func.value.id == 'models' and
                                     y.value.func.attr == 'TextField'):
                                 self.body_field_found = True
+                            if (isinstance(y, ast.Assign) and 
+                                    y.targets[0].id == 'postdate' and
+                                    y.value.func.value.id == 'models' and 
+                                    y.value.func.attr == 'DateTimeField'):
+                                self.postdate_field_found = True
+                                for keyword in y.value.keywords:
+                                    if (self.check_keyword(keyword, 'auto_now_add', True)):
+                                        self.postdate_auto_now_found = True
+                                    if (self.check_keyword(keyword, 'blank', True)):
+                                        self.postdata_blank_found = True
+                            if (isinstance(y, ast.FunctionDef) and
+                                    y.name == '__str__' and
+                                    y.args.args[0].arg == 'self'):
+                                for z in y.body:
+                                    if (isinstance(z, ast.Return) and
+                                        z.value.value.id == 'self' and
+                                        z.value.attr == 'title'):
+                                        self.str_method_found = True
+                            if (isinstance(y, ast.FunctionDef) and
+                                    y.name == 'get_absolute_url' and
+                                    y.args.args[0].arg == 'self'):
+                                self.get_abs_url_found = self.check_get_abs_url(y.body)
 
         except:
             pass
+
+    def check_get_abs_url(self, body):
+        for z in body:
+            if (isinstance(z, ast.Return) and 
+                z.value.func.id == 'reverse' and 
+                z.value.args[0].value == 'post' and
+                z.value.keywords[0].value.elts[0].args[0].value.id == 'self' and
+                z.value.keywords[0].value.elts[0].args[0].attr == 'id'):
+                return True
 
 
     def test_task1_post_model_exists(self):    
@@ -103,3 +139,12 @@ class PostTestCase(SimplerTestCase):
     def test_task4_postdate_exists(self):
         """`postdate = models.DateTimeField(auto_now_add=True, blank=True)`"""
         self.assertTrue(self.postdate_field_found, msg="Did you add the `postdate` field and parameters?")
+        self.assertTrue(self.postdate_auto_now_found, msg="Did you add `auto_now_add` to the `postdate` field?")
+        self.assertTrue(self.postdata_blank_found, msg="Did you add the `blank` parameter to the `postdate` field?")
+
+    def test_task5_str_exists(self):
+        self.assertTrue(self.str_method_found, msg="Did you implement the `__str__` method in the `post` model class?")
+    
+    def test_task6_get_abs_url_exists(self):
+        self.assertTrue(self.get_abs_url_found, msg="Did you implement the `get_absolute_url` method?")
+

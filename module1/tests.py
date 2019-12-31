@@ -13,7 +13,7 @@ class UsersTestCase(SimplerTestCase):
         self.assertTrue(os.path.isfile('users/views.py'), msg=msg)
 
     def test_task2_add_settings(self):
-        self.assertIn('users', settings.INSTALLED_APPS, msg="Check if users app is in INSTALLED_APPS")
+        self.assertTrue('users' in settings.INSTALLED_APPS, msg="Check if users app is in INSTALLED_APPS")
 
     def test_task3_add_template(self):
         self.assertTrue(os.path.isdir('users/templates'), msg="Did you create the `templates` directory in `users`?")
@@ -117,25 +117,25 @@ Call `admin.site.register()` with `User` and `UserAdmin` as parameters."""
         routes = node.value.elts
         for entry in routes:
             if (entry.func.id == 'path' and 
-                entry.args[0].value == 'login/' and 
+                getattr(entry.args[0], self.value) == 'login/' and 
                 entry.args[1].func.value.value.id == 'auth_views' and 
                 entry.args[1].func.value.attr == 'LoginView' and 
                 entry.args[1].func.attr == 'as_view' and 
                 entry.args[1].keywords[0].arg == 'template_name' and 
-                entry.args[1].keywords[0].value.value == 'login.html' and 
+                getattr(entry.args[1].keywords[0].value, self.value) == 'login.html' and 
                 entry.keywords[0].arg == 'name' and 
-                entry.keywords[0].value.value == 'login' ):
+                getattr(entry.keywords[0].value, self.value) == 'login' ):
                 """path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),"""
                 login_path_found = True
             elif (entry.func.id == 'path' and 
-                entry.args[0].value == 'logout/' and 
+                getattr(entry.args[0], self.value) == 'logout/' and 
                 entry.args[1].func.value.value.id == 'auth_views' and 
                 entry.args[1].func.value.attr == 'LogoutView' and 
                 entry.args[1].func.attr == 'as_view' and 
                 entry.args[1].keywords[0].arg == 'next_page' and 
-                entry.args[1].keywords[0].value.value == 'index' and 
+                getattr(entry.args[1].keywords[0].value, self.value) == 'index' and 
                 entry.keywords[0].arg == 'name' and 
-                entry.keywords[0].value.value == 'logout' ):
+                getattr(entry.keywords[0].value, self.value) == 'logout' ):
                 """    path('logout/', auth_views.LogoutView.as_view(next_page='index' ), name='logout'),"""
                 logout_path_found = True
         return login_path_found, logout_path_found
@@ -156,9 +156,9 @@ Call `admin.site.register()` with `User` and `UserAdmin` as parameters."""
                     routes = x.value.elts
                     for entry in routes:
                         if (entry.func.id == 'path' and 
-                            entry.args[0].value == 'accounts/' and 
+                            getattr(entry.args[0], self.value) == 'accounts/' and 
                             entry.args[1].func.id == 'include' and 
-                            entry.args[1].args[0].value == 'users.urls'):
+                            getattr(entry.args[1].args[0], self.value) == 'users.urls'):
                                 users_path_found = True
         except:
             # Catch any bad things that happened above and fail the test.

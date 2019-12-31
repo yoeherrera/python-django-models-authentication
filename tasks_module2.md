@@ -38,10 +38,10 @@ Add a field called `postdate` of type `models.DateTimeField()` with parameters `
 `postdate = models.DateTimeField(auto_now_add=True, blank=True)`
 
 # Add string method
-Adding a `str()` method to the class will simplify rendering in admin view and our templates. In the `BlogPost` class, create a method called `str` that takes a parameter called `self`. Have the method return `self.title`. 
+Adding a `__str__()` method to the class will simplify rendering in admin view and our templates. In the `BlogPost` class, create a method called `__str__` that takes a parameter called `self`. Have the method return `self.title`. 
 
 ```python
-def str(self):
+def __str__(self):
 	return self.title
 ```
 
