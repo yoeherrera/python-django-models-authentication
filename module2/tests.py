@@ -45,7 +45,7 @@ class PostTestCase(SimplerTestCase):
                                     y.value.func.attr == 'CharField'):
                                 self.title_found = True
                                 if (y.value.keywords[0].arg == 'max_length' and
-                                        y.value.keywords[0].value.value == 200):
+                                        getattr(y.value.keywords[0].value, self.value_num) == 200):
                                     self.max_length_found = True
                             if (isinstance(y, ast.Assign) and
                                     y.targets[0].id == 'author' and
@@ -57,7 +57,7 @@ class PostTestCase(SimplerTestCase):
                                     self.author_user_model_found = True
                                 for keyword in y.value.keywords:
                                     if (keyword.arg == 'related_name' and 
-                                        keyword.value.value == 'posts'):
+                                        getattr(keyword.value, self.value) == 'posts'):
                                         self.author_related_name_found = True
                                     if (keyword.arg == 'on_delete' and 
                                         keyword.value.value.id == 'models' and 
@@ -102,7 +102,7 @@ class PostTestCase(SimplerTestCase):
         for z in body:
             if (isinstance(z, ast.Return) and 
                 z.value.func.id == 'reverse' and 
-                z.value.args[0].value == 'post' and
+                getattr(z.value.args[0], self.value) == 'post' and
                 z.value.keywords[0].value.elts[0].args[0].value.id == 'self' and
                 z.value.keywords[0].value.elts[0].args[0].attr == 'id'):
                 return True

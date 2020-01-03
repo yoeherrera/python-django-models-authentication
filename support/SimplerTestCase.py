@@ -4,6 +4,7 @@ import sys, ast
 class SimplerTestCase(SimpleTestCase):
     def __init__(self, *args):
         self.value = (sys.version_info >= (3, 8) and 'value') or 's'
+        self.value_num = (sys.version_info >= (3, 8) and 'value') or 'n'
         super().__init__(*args)
 
     def assertTrue(self, expr, msg=None):
