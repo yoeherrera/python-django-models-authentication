@@ -5,7 +5,7 @@ We’re going to create a separate user app within our project.  Run the followi
 
 # Include the new app into the project
 
-Inside of `settings.py`, find the `INSTALLED_APPS` list and after `'mainapp'`, add `'users'`.
+Inside of `settings.py` (located in `blogproj/`), find the `INSTALLED_APPS` list and after `'mainapp'`, add `'users'`.
 
 # Add login template
 

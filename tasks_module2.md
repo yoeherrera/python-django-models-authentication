@@ -68,7 +68,7 @@ admin.site.register(BlogPost)
 
 Now we need to update `mainapp/views.py` to include our new `BlogPost` model. First let's import the `BlogPost` model from `.models`. Also import the `get_object_or_404` method from `django.shortcuts`.
 
-Next in the `index` method, set the `posts` variable to `BlogPosts.objects.all()` instead of `ALL_POSTS`.
+Next in the `index` method, set the `posts` variable to `BlogPost.objects.all()` instead of `ALL_POSTS`.
 
 # Include model in post view
 

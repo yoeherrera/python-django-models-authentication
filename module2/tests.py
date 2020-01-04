@@ -148,3 +148,58 @@ class PostTestCase(SimplerTestCase):
     def test_task6_get_abs_url_exists(self):
         self.assertTrue(self.get_abs_url_found, msg="Did you implement the `get_absolute_url` method?")
 
+    def test_task7_register_model_in_admin(self):
+        import_BlogPost_found = False
+        admin_site_register_found = False
+
+        try:
+            for x in self.load_ast_tree('mainapp/admin.py').body:
+                if type(x) is ast.ImportFrom:
+                    if x.module == 'models' and x.names[0].name == 'BlogPost':
+                        import_BlogPost_found = True
+                elif type(x) is ast.Expr:   
+                    if (x.value.func.value.value.id == 'admin' and 
+                        x.value.func.value.attr == 'site' and
+                        x.value.func.attr == 'register'):
+                        if (x.value.args[0].id == 'BlogPost'):
+                            admin_site_register_found = True
+        except:
+            # Catch any bad things that happened above and fail the test.
+            pass
+        
+        self.assertTrue(import_BlogPost_found, msg="Did you import `BlogPost`?")
+        self.assertTrue(admin_site_register_found, msg="Did you remember to register the model to the admin site?")
+
+    def test_task8_update_views_with_BlogPost(self):
+        # Now we need to update `mainapp/views.py` to include our new `BlogPost` model. 
+        # First let's import the `BlogPost` model from `.models`. 
+        # Also import the `get_object_or_404` method from `django.shortcuts`.
+        # Next in the `index` method, set the `posts` variable to `BlogPost.objects.all()` 
+        # instead of `ALL_POSTS`.    
+
+        import_BlogPost_found = False
+        import_404_found = False
+        set_posts = False
+
+        try:
+            for x in self.load_ast_tree('mainapp/views.py').body:
+                if type(x) is ast.ImportFrom:
+                    if x.module == 'models' and x.names[0].name == 'BlogPost':
+                        import_BlogPost_found = True
+                    elif x.module == 'django.shortcuts' and x.names[0].name == 'get_object_or_404':
+                        import_404_found = True
+                elif type(x) is ast.FunctionDef:   
+                    if (x.name == 'index'):
+                        for y in x.body:
+                            if type(y) is ast.Assign:
+                                if (y.value.func.value.value.id == 'BlogPost' 
+                                and y.value.func.value.attr == 'objects'
+                                and y.value.func.attr == 'all'):
+                                    set_posts = True
+        except:
+            # Catch any bad things that happened above and fail the test.
+            pass
+        
+        self.assertTrue(import_BlogPost_found, msg="Did you import `BlogPost`?")
+        self.assertTrue(import_404_found, msg="Did you import `get_object_or_404`?")
+        self.assertTrue(set_posts, msg="Did you set `posts` equal to `BlogPost.objects.all()`?")
