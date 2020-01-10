@@ -13,6 +13,8 @@ class PostTestCase(SimplerTestCase):
             self.str_method_found = False
             self.clean_method_found = False
             self.clean_assign_found = False
+            self.tags_field_found = False
+            self.tag_many_to_many_found = False
 
             self.check_model_file()
 
@@ -53,9 +55,21 @@ class PostTestCase(SimplerTestCase):
                                                 z.targets[0].value.id == 'self' and
                                                 z.targets[0].attr == 'name'):
                                                 self.clean_assign_found = True
+
+                    elif x.name == 'BlogPost':
+                        for y in x.body:
+                            if (isinstance(y, ast.Assign) and
+                                    y.targets[0].id == 'tags' and
+                                    y.value.func.value.id == 'models' and
+                                    y.value.func.attr == 'ManyToManyField'):
+                                self.tags_field_found = True
+                                if (y.value.keywords[0].arg == 'related_name' and
+                                        getattr(y.value.keywords[0].value, self.value) == 'posts' and
+                                        getattr(y.value.args[0], self.value) == 'Tag'):
+                                    self.tag_many_to_many_found = True
         except Exception as e:
-            # print('e = ' + e)
-            pass
+            print(e)
+            #pass
             
 
 
@@ -76,3 +90,7 @@ class PostTestCase(SimplerTestCase):
 
     def test_task3_str_exists(self):
         self.assertTrue(self.str_method_found, msg="Did you implement the `__str__` method in the `tag` model class?")
+
+    def test_task4_many_to_many_exists(self):
+        self.assertTrue(self.tags_field_found, msg="Did you add the `name` field?")
+        self.assertTrue(self.tag_many_to_many_found, msg="Did you set `tags` equal to the `ManyToManyField`?")
