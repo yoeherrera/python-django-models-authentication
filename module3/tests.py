@@ -50,9 +50,12 @@ class PostTestCase(SimplerTestCase):
                                 self.clean_method_found = True
                                 for z in y.body:
                                     if (isinstance(z, ast.Assign) and
-                                                z.targets[0].value.id == 'self' and
-                                                z.targets[0].attr == 'name'):
-                                                self.clean_assign_found = True
+                                        z.targets[0].value.id == 'self' and
+                                        z.targets[0].attr == 'name' and 
+                                        z.value.func.value.value.id == 'self' and
+                                        z.value.func.value.attr == 'name' and
+                                        z.value.func.attr == 'lower'):
+                                        self.clean_assign_found = True
         except Exception as e:
             # print('e = ' + e)
             pass
