@@ -1,4 +1,4 @@
-import ast
+import ast, os
 from support.SimplerTestCase import SimplerTestCase
 
 class PostTestCase(SimplerTestCase):
@@ -186,8 +186,8 @@ class PostTestCase(SimplerTestCase):
                 if type(x) is ast.ImportFrom:
                     if x.module == 'models' and x.names[0].name == 'BlogPost':
                         import_BlogPost_found = True
-                    elif x.module == 'django.shortcuts' and x.names[0].name == 'get_object_or_404':
-                        import_404_found = True
+                    elif x.module == 'django.shortcuts':
+                        import_404_found = next((True for y in x.names if y.name == 'get_object_or_404'), False) or import_404_found
                 elif type(x) is ast.FunctionDef:   
                     if (x.name == 'index'):
                         for y in x.body:
@@ -203,3 +203,36 @@ class PostTestCase(SimplerTestCase):
         self.assertTrue(import_BlogPost_found, msg="Did you import `BlogPost`?")
         self.assertTrue(import_404_found, msg="Did you import `get_object_or_404`?")
         self.assertTrue(set_posts, msg="Did you set `posts` equal to `BlogPost.objects.all()`?")
+
+
+    def test_task9_update_post_view_with_BlogPost(self):
+        try_catch_found = False
+        set_posts_found = False
+        get_objects_params_found = False
+
+        try:
+            for x in self.load_ast_tree('mainapp/views.py').body:
+                if type(x) is ast.FunctionDef and x.name == 'post':
+                    for y in x.body:
+                        if type(y) is ast.Try:
+                            try_catch_found = True
+                        if type(y) is ast.Assign:
+                            if (y.targets[0].id == 'post' and
+                                y.value.func.id == 'get_object_or_404'):
+                                set_posts_found = True
+                                if (y.value.args[0].id == 'BlogPost' and 
+                                    y.value.keywords[0].arg == 'pk' and
+                                    y.value.keywords[0].value.id == 'id'):
+                                    get_objects_params_found = True
+        except:
+            # Catch any bad things that happened above and fail the test.
+            pass
+        
+        self.assertTrue(try_catch_found == False, msg="Did you remove the `try/catch` block?")
+        self.assertTrue(set_posts_found, msg="Did you set `post` equal to `get_object_or_404`?")
+        self.assertTrue(get_objects_params_found, msg="Check the parameters to `get_object_or_404`.")
+
+    def test_task10_make_migrations(self):
+        msg = "Did you use `manage.py makemigrations` to create the `BlogPost` migrations file? Don't forget to `add` it to the git repo."
+        self.assertTrue(os.path.isdir('mainapp/migrations/'), msg=msg)
+        self.assertTrue(self.check_migration('mainapp/migrations/', 'BlogPost'), msg=msg)

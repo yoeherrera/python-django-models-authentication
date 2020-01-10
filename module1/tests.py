@@ -177,4 +177,5 @@ Call `admin.site.register()` with `User` and `UserAdmin` as parameters."""
         msg = "Did you use `manage.py makemigrations` to create the `users` migrations file? Don't forget to `add` it to the git repo."
         self.assertTrue(os.path.isdir('users/migrations/'), msg=msg)
         self.assertTrue(os.path.isfile('users/migrations/0001_initial.py'), msg=msg)
+        self.assertTrue(self.check_migration('users/migrations/', 'User'), msg=msg)
         

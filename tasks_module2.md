@@ -17,7 +17,7 @@ class BlogPost(models.Model):
 
 To add the foreign key, we need to know which user model is in use. This is stored in the Django setting called `AUTH_USER_MODEL`. Lets first import those settings.
 
-Add `from  django.conf  import  settings` to the top of the file. Then in the body of our `BlogPost` class, add a new field called `author` with type of `models.ForeignKey()`. Pass the following parameters to `ForeignKey()`: `settings.AUTH_USER_MODEL`, `related_name="posts"`, and `on_delete=models.CASCADE`.
+Add `from django.conf import settings` to the top of the file. Then in the body of our `BlogPost` class, add a new field called `author` with type of `models.ForeignKey()`. Pass the following parameters to `ForeignKey()`: `settings.AUTH_USER_MODEL`, `related_name="posts"`, and `on_delete=models.CASCADE`.
     
 ```python
 author = models.ForeignKey(
@@ -83,4 +83,7 @@ Now that we’ve added our `BlogPost` model, we need to run migrations again. Fr
 `python manage.py makemigrations`
 `python manage.my migrate`
 
+Once created, add the newly created migrations from `mainapp/migrations/` to the git repo and commit them.
+
 Note: Make sure your `venv` is activated with `source venv/bin/activate`
+ 
