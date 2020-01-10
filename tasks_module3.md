@@ -27,31 +27,50 @@ Since we want tags to categorize posts by topic, we want to create a relationshi
     tags = models.ManyToManyField('Tag', related_name='posts')
 ```
 
-#### Add post by tag view to mainapp/views.py
-We would like to display a Tag page that displays all of the posts with that Tag.  In order to do that, we need to create a view that will generate that page.  In `mainapp/views.py`, create a function `tag_posts(request, name)`.  Then (NEED TO SPLIT INTO MORE STEPS)
+#### Add view to display posts by tag to mainapp/views.py
+We would like to display a Tag page that displays all of the posts with that Tag.  In order to do that, we need to create a view that will generate that page.  In `mainapp/views.py`, create a function `tag_posts(request, name)`.  Also return `render(request, 'mainapp/filtered_post_list.html')`.
 
 
 ```python
 def tag_posts(request, name):
+    return render(request, 'mainapp/filtered_post_list.html')
+```
+
+#### Pass title to template
+We want to pass a title for Tag page to the template.  First, create a `name` variable and set it equal to `name.lower()` so we can ensure the tag is lowercase.  Then, create a `title` variable and set it equal to `"Posts about {}".format(name)`.
+To pass the `title` to the template, add the following parameter to the end of the render() call, `{'title':title}`.
+
+```python
+def tag_posts(request, name):
     name = name.lower()
-    try:
-        tag = Tag.objects.get(name=name)
-        posts = tag.posts.all()
-    except:
-        posts = []
     title = "Posts about {}".format(name)
 
     return render(request, 'mainapp/filtered_post_list.html', {'posts':posts, 'title':title})
 ```
 
-#### Add get_absolute_url method to enable us to access tag page by model reference.
+#### Find posts and pass to template
+Since we want to display all of the posts with the name tag, let's first find the Tag object.  Call `Tag.objects.get(name=name)` and set that equal to a tag variable.  Then, get all of the posts with that tag by calling `tag.posts.all()` and setting the result equal to a variable named `posts`. Since the tag may not exist, wrap those 2 lines in try/except blocks.  In the except block, set `posts = []`.  Finally, pass the `posts` list to the template by adding `'posts':posts` to the dict in the `render()` call, `{'posts':posts, 'title':title}`.
+
+```python
+def tag_posts(request, name):
+    name = name.lower()
+    title = "Posts about {}".format(name)
+    try:
+        tag = Tag.objects.get(name=name)
+        posts = tag.posts.all()
+    except:
+        posts = []
+    
+
+    return render(request, 'mainapp/filtered_post_list.html', {'posts':posts, 'title':title})
+```
+
+#### In Tag model add get_absolute_url() method 
 To generate a url for the specified tag page, we can use django.urls reverse() function to generate the url from the view. Back in the `Tag` class, in `mainapp/models.py`, create a method `get_absolute_url(self)` that returns `reverse('tag_posts', args=[str(self.name)])`. Where `tag_posts` is the name of the view we just created. 
 ```python
     def get_absolute_url(self):
         return reverse('tag_posts', args=[str(self.name)])
 ```
-
-
 
 #### Add tag path and new view to mainapp/urls.py
 
@@ -70,7 +89,7 @@ from .models import BlogPost, Tag
 admin.site.register(Tag)
 ```
 
-#### Add default value to migration for each post.
+#### Add Posts with tags (optional task)
 
 TBD
 
