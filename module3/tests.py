@@ -13,6 +13,8 @@ class PostTestCase(SimplerTestCase):
             self.str_method_found = False
             self.clean_method_found = False
             self.clean_assign_found = False
+            self.tags_field_found = False
+            self.tags_args_found = False
 
             self.check_model_file()
 
@@ -21,7 +23,22 @@ class PostTestCase(SimplerTestCase):
         try:
             for x in self.load_ast_tree('mainapp/models.py').body:
                 if isinstance(x, ast.ClassDef):
-                    if x.name == 'Tag':
+                    if x.name == 'BlogPost':
+                        for y in x.body:
+                            if (isinstance(y, ast.Assign) and
+                                y.targets[0].id == 'tags' and
+                                y.value.func.value.id == 'models' and
+                                y.value.func.attr == 'ManyToManyField'):
+                                self.tags_field_found = True
+                                
+                                if (len(y.value.keywords) > 0 and 
+                                    y.value.keywords[0].arg == 'related_name' and 
+                                    getattr(y.value.keywords[0].value, self.value) == 'posts' and
+                                    len(y.value.args) > 0 and
+                                    getattr(y.value.args[0], self.value) == 'Tag'):
+                                    self.tags_args_found = True
+
+                    elif x.name == 'Tag':
                         self.class_found = True
                         if (len(x.bases) > 0 and
                             x.bases[0].value.id == 'models' and
@@ -79,3 +96,8 @@ class PostTestCase(SimplerTestCase):
 
     def test_task3_str_exists(self):
         self.assertTrue(self.str_method_found, msg="Did you implement the `__str__` method in the `tag` model class?")
+
+    def test_task4_tags_field_exists(self):
+        self.assertTrue(self.tags_field_found, msg="Did you add the `tags` many-to-many relationship in the `BlogPost` class?")
+        self.assertTrue(self.tags_args_found, msg="Did you add the right arguments to the `Tags` many-to-many field?")
+
