@@ -74,14 +74,16 @@ def tag_posts(request, name):
     return render(request, 'mainapp/filtered_post_list.html', {'posts':posts, 'title':title})
 ```
 
-#### In Tag model add get_absolute_url() method 
+#### Add url reverser to Tag model
 To generate a url for the specified tag page, we can use django.urls reverse() function to generate the url from the view. Back in the `Tag` class, in `mainapp/models.py`, create a method `get_absolute_url(self)` that returns `reverse('tag_posts', args=[str(self.name)])`. Where `tag_posts` is the name of the view we just created. 
 ```python
     def get_absolute_url(self):
         return reverse('tag_posts', args=[str(self.name)])
 ```
 
-#### Add tag path and new view to mainapp/urls.py
+#### Add tag path and new view to routes
+
+In `mainapp/urls.py` add a new `path` entry into the urlpatterns list. Pass 'tag/<str:name>' as the URL, 'views.tag_posts' as the view, and set `name` to `'tag_posts'`.
 
 ```python
     path('tag/<str:name>', views.tag_posts, name='tag_posts'),
@@ -89,9 +91,12 @@ To generate a url for the specified tag page, we can use django.urls reverse() f
 
 #### Uncomment tag section of index and post templates
 
-Remove `<!-- -->` tags from both index and post templates.
+Remove `{% comment %}` and {% endcomment %} tags from both post list snippet and post template (`templates/mainapp/snippet_post_list.html` & `templates/mainapp/post.html`).
 
-#### Add tags to admin.py
+#### Add tags to the admin site
+
+Register tags on the admin site by first importing `Tag` from `.models` in `mainapp/admin.py`. Then call `admin.site.register` on the `Tag` model.
+
 
 ```python
 from .models import BlogPost, Tag
@@ -104,7 +109,12 @@ TBD
 
 #### Make migrations and migrate.
 
-```bash
-python manage.py makemigrations
-python manage.my migrate
-```
+Now that we’ve added our last model, `Tag`, we're ready for our final migration. From the command line, inside the root of the project, run the following commands:
+
+`python manage.py makemigrations`
+`python manage.my migrate`
+
+Once created, add the newly created migrations from `mainapp/migrations/` to the git repo and commit them.
+
+Note: Make sure your `venv` is activated with `source venv/bin/activate`
+ 
