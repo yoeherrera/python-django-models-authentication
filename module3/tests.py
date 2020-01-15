@@ -24,7 +24,9 @@ class PostTestCase(SimplerTestCase):
             self.tag_view_blogpost_filter_found = False
             self.tag_view_name_assign_found = False
 
-            self.check_model_file()
+            self.tag_posts_route_found = False
+            self.tag_posts_view_found = False
+            self.tag_posts_name_found = False
 
 
     def check_model_file(self):
@@ -90,7 +92,8 @@ class PostTestCase(SimplerTestCase):
         """ Add Tag model to models.py
             class Tag(models.Model):
                 name = models.CharField(max_length=50, unique=True) """
-        
+        self.check_model_file()
+
         self.assertTrue(self.class_found, msg="Did you create the `Tag` class?")
         self.assertTrue(self.base_class_found, msg="Make sure you added `models.Model` as the base class of `BlogPost`.")
         self.assertTrue(self.title_found, msg="Did you add the `name` field?")
@@ -98,13 +101,17 @@ class PostTestCase(SimplerTestCase):
 
     def test_task2_clean_method_exists(self):
         """Add clean method to sanitize input."""
+        self.check_model_file()
+
         self.assertTrue(self.clean_method_found, msg="Did you implement the `clean` method in the `tag` model class?")
         self.assertTrue(self.clean_assign_found, msg="Did you assign to `self.name` in the `clean` method?")
 
     def test_task3_str_exists(self):
+        self.check_model_file()
         self.assertTrue(self.str_method_found, msg="Did you implement the `__str__` method in the `tag` model class?")
 
     def test_task4_many_to_many_exists(self):
+        self.check_model_file()
         self.assertTrue(self.tags_field_found, msg="Did you add the `name` field?")
         self.assertTrue(self.tag_many_to_many_found, msg="Did you set `tags` equal to the `ManyToManyField`?")
    
@@ -176,3 +183,29 @@ class PostTestCase(SimplerTestCase):
         self.assertTrue(self.tag_view_get_object_found, msg="Did you set `tag` to `get_object_or_404`'s result?")
         self.assertTrue(self.tag_view_blogpost_filter_found, msg="Did you set `posts` to `BlogPost.objects.filter`'s result?")
      
+    def test_task8_add_tag_url(self):
+        # path('tag/<str:name>', views.tag_posts, name='tag_posts')
+        self.check_urls_file()
+        self.assertTrue(self.tag_posts_route_found, msg="Did you add the tag path to urls.py with the route `'tag/<str:name>'`?")
+        self.assertTrue(self.tag_posts_view_found, msg="Did you add the tag path to urls.py with the view `views.tag_posts`?")
+        self.assertTrue(self.tag_posts_name_found, msg="Did you add the tag path to urls.py with the `name = 'tag_posts'`?")
+
+    def check_urls_file(self):
+        try:
+            for x in self.load_ast_tree('mainapp/urls.py').body:
+                if type(x) is ast.Assign:   
+                    if (x.targets[0].id == 'urlpatterns'):
+                        for y in x.value.elts:
+                            if type(y) is ast.Call: 
+                                if getattr(y.args[0], self.value) == 'tag/<str:name>':
+                                    self.tag_posts_route_found = True
+                                if (y.args[1].value.id == 'views' and 
+                                    y.args[1].attr == 'tag_posts'):
+                                    self.tag_posts_view_found = True
+                                if (y.keywords[0].arg == 'name' and 
+                                    getattr(y.keywords[0].value, self.value) == 'tag_posts'):
+                                    self.tag_posts_name_found = True
+        except Exception as e:
+            print(e)
+            # Catch any bad things that happened above and fail the test.
+            pass
