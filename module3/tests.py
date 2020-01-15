@@ -24,9 +24,17 @@ class PostTestCase(SimplerTestCase):
             self.tag_view_blogpost_filter_found = False
             self.tag_view_name_assign_found = False
 
+            # Task 8
             self.tag_posts_route_found = False
             self.tag_posts_view_found = False
             self.tag_posts_name_found = False
+
+            # Task 9
+            self.get_absolute_url_found = False
+            self.get_absolute_url_return_found = False
+            self.get_absolute_url_reverse_found = False
+            self.get_absolute_url_post_found = False
+            self.get_absolute_url_args_correct = False
 
 
     def check_model_file(self):
@@ -82,9 +90,24 @@ class PostTestCase(SimplerTestCase):
                                         len(y.value.args) > 0 and
                                         getattr(y.value.args[0], self.value) == 'Tag'):
                                     self.tag_many_to_many_found = True
+                            # Task 9
+                            if (isinstance(y, ast.FunctionDef) and
+                                y.name == 'get_absolute_url'):
+                                self.get_absolute_url_found = True
+                                if isinstance(y.body[0], ast.Return):
+                                    self.get_absolute_url_return_found = True
+                                    if y.body[0].value.func.id == 'reverse':
+                                        self.get_absolute_url_reverse_found = True
+                                        if getattr(y.body[0].value.args[0], self.value) == 'post':
+                                            self.get_absolute_url_post_found = True
+                                            if (y.body[0].value.keywords[0].arg == 'args' and
+                                                y.body[0].value.keywords[0].value.elts[0].func.id == 'str' and
+                                                y.body[0].value.keywords[0].value.elts[0].args[0].value.id == 'self' and
+                                                y.body[0].value.keywords[0].value.elts[0].args[0].attr == 'id'):
+                                                self.get_absolute_url_args_correct = True
+
         except Exception as e:
-            # printe)
-            pass
+            print(e)
             
 
 
@@ -209,3 +232,15 @@ class PostTestCase(SimplerTestCase):
             print(e)
             # Catch any bad things that happened above and fail the test.
             pass
+
+    def test_task9_url_reverser(self):
+        # def get_absolute_url(self):
+        #     return reverse('tag_posts', args=[str(self.name)])
+        self.check_model_file()
+        self.assertTrue(self.get_absolute_url_found, msg="The method `get_absolute_url()` does not exist in the BlogPost model.")
+        self.assertTrue(self.get_absolute_url_return_found, msg="The method `get_absolute_url()` does not return anything.")
+        self.assertTrue(self.get_absolute_url_reverse_found, msg="The method `get_absolute_url()` does not call `reverse()`.")
+        self.assertTrue(self.get_absolute_url_post_found, msg="In `get_absolute_url()` the first argument in `reverse()` should be `'post'`.")
+        self.assertTrue(self.get_absolute_url_args_correct, msg="In `get_absolute_url()` the second argument in `reverse()` should be `args=[str(self.id)]`.")
+
+
