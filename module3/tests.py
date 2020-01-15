@@ -243,4 +243,26 @@ class PostTestCase(SimplerTestCase):
         self.assertTrue(self.get_absolute_url_post_found, msg="In `get_absolute_url()` the first argument in `reverse()` should be `'post'`.")
         self.assertTrue(self.get_absolute_url_args_correct, msg="In `get_absolute_url()` the second argument in `reverse()` should be `args=[str(self.id)]`.")
 
+    def test_task11_admin_register_tag(self):
+        # from .models import BlogPost, Tag
+        #   admin.site.register(Tag)
+        import_Tag_found = False
+        admin_site_register_found = False
 
+        try:
+            for x in self.load_ast_tree('mainapp/admin.py').body:
+                if type(x) is ast.ImportFrom:
+                    if x.module == 'models' and (x.names[0].name == 'Tag' or x.names[1].name == 'Tag'):
+                        import_Tag_found = True
+                elif type(x) is ast.Expr:   
+                    if (x.value.func.value.value.id == 'admin' and 
+                        x.value.func.value.attr == 'site' and
+                        x.value.func.attr == 'register'):
+                        if (x.value.args[0].id == 'Tag'):
+                            admin_site_register_found = True
+        except:
+            # Catch any bad things that happened above and fail the test.
+            pass
+        
+        self.assertTrue(import_Tag_found, msg="Did you import `Tag`?")
+        self.assertTrue(admin_site_register_found, msg="Did you register the Tag model to the admin site?")
