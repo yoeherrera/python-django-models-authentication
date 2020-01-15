@@ -15,6 +15,14 @@ class PostTestCase(SimplerTestCase):
             self.clean_assign_found = False
             self.tags_field_found = False
             self.tag_many_to_many_found = False
+            self.tag_view_found = False
+            self.tag_view_set_title_found = False
+            self.tag_view_return_params_found = False
+            self.tag_view_post_dict_found = False
+            self.tag_view_title_dict_found = False
+            self.tag_view_get_object_found = False
+            self.tag_view_blogpost_filter_found = False
+            self.tag_view_name_assign_found = False
 
             self.check_model_file()
 
@@ -99,3 +107,72 @@ class PostTestCase(SimplerTestCase):
     def test_task4_many_to_many_exists(self):
         self.assertTrue(self.tags_field_found, msg="Did you add the `name` field?")
         self.assertTrue(self.tag_many_to_many_found, msg="Did you set `tags` equal to the `ManyToManyField`?")
+   
+    def check_views_file(self):
+        try:
+            for x in self.load_ast_tree('mainapp/views.py').body:
+                if type(x) is ast.FunctionDef:   
+                    if (x.name == 'tag_posts'):
+                        self.tag_view_found = True
+                        for y in x.body:
+                            if (isinstance(y, ast.Return) and 
+                                y.value.func.id == 'render' and 
+                                len(y.value.args) >= 2 and 
+                                y.value.args[0].id == 'request' and 
+                                getattr(y.value.args[1], self.value) == 'mainapp/filtered_post_list.html'):
+                                self.tag_view_return_params_found = True
+                                if (len(y.value.args) >= 3 and
+                                    isinstance(y.value.args[2], ast.Dict)):
+                                    for z in y.value.args[2].keys:
+                                        if (getattr(z, self.value) == 'title'):
+                                            self.tag_view_title_dict_found = True
+                                        if (getattr(z, self.value) == 'posts'):
+                                            self.tag_view_post_dict_found = True
+                                        
+                            elif (isinstance(y, ast.Assign) and
+                                  y.targets[0].id == 'title' and 
+                                  getattr(y.value.func.value, self.value) == "Posts about {}" and
+                                  y.value.func.attr == 'format' and
+                                  len(y.value.args) > 0 and
+                                  y.value.args[0].id == 'name'):
+                                self.tag_view_set_title_found = True
+
+                            elif (isinstance(y, ast.Assign) and
+                                  y.targets[0].id == 'name' and
+                                  y.value.func.value.id == 'name' and
+                                  y.value.func.attr == 'lower'):
+                                self.tag_view_name_assign_found = True
+
+                            elif (isinstance(y, ast.Assign) and
+                                  y.targets[0].id == 'tag' and 
+                                  y.value.func.id == 'get_object_or_404'):
+                                self.tag_view_get_object_found = True
+
+                            elif (isinstance(y, ast.Assign) and
+                                  y.targets[0].id == 'posts' and 
+                                  y.value.func.value.value.id == 'BlogPost' and
+                                  y.value.func.value.attr == 'objects' and 
+                                  y.value.func.attr == 'filter'):
+                                self.tag_view_blogpost_filter_found = True
+        except Exception as e:
+            print(e)
+            # Catch any bad things that happened above and fail the test.
+            pass
+        
+    def test_task5_tag_view(self):
+        self.check_views_file()
+
+        self.assertTrue(self.tag_view_found, msg="Did you create the `tag_post` function?")
+        self.assertTrue(self.tag_view_return_params_found, msg="Did you return the result of the `render` function?")
+
+    def test_task6_tag_view_title(self):
+        self.check_views_file()                                    
+        self.assertTrue(self.tag_view_name_assign_found, msg="Did you lowercase `name` in the `tag_post` method?")
+        self.assertTrue(self.tag_view_set_title_found, msg="Did you set the `title` string in `tag_post`?")
+        self.assertTrue(self.tag_view_title_dict_found, msg="Did you pass the `title` field to the `render` function?")                                
+    def test_task7_tag_view_find_posts(self):
+        self.check_views_file()
+
+        self.assertTrue(self.tag_view_get_object_found, msg="Did you set `tag` to `get_object_or_404`'s result?")
+        self.assertTrue(self.tag_view_blogpost_filter_found, msg="Did you set `posts` to `BlogPost.objects.filter`'s result?")
+     
