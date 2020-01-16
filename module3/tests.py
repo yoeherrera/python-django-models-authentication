@@ -246,11 +246,14 @@ class PostTestCase(SimplerTestCase):
     def test_task10_uncomment_templates(self):
         # Remove `{% comment %}` and {% endcomment %} tags from 
         # `templates/mainapp/snippet_post_list.html` & `templates/mainapp/post.html`
-        filename = 'mainapp/templates/mainapp/snippet_post_list.html'
-        comment_found, endcomment_found = self.check_for_comments(filename)
+        filenames = ['mainapp/templates/mainapp/snippet_post_list.html',
+                    'mainapp/templates/mainapp/post.html']
 
-        self.assertTrue(not comment_found, msg="There is still a `{% comment %}` tag in `" + filename + "`")
-        self.assertTrue(not endcomment_found, msg="There is still an `{% endcomment %}` tag in `" + filename + "`")
+        for filename in filenames:
+            comment_found, endcomment_found = self.check_for_comments(filename)
+
+            self.assertTrue(not comment_found, msg="There is still a `{% comment %}` tag in `" + filename + "`")
+            self.assertTrue(not endcomment_found, msg="There is still an `{% endcomment %}` tag in `" + filename + "`")
 
     def test_task11_admin_register_tag(self):
         # from .models import BlogPost, Tag
