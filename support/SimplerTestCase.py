@@ -13,9 +13,12 @@ class SimplerTestCase(SimpleTestCase):
 
     @staticmethod
     def load_ast_tree(filename):
-        with open(filename) as f:
-            fstr = f.read()
-        return ast.parse(fstr, filename=filename)
+        try:
+            with open(filename) as f:
+                fstr = f.read()
+                return ast.parse(fstr, filename=filename)
+        except:
+            return ast.parse("()")
 
     @staticmethod
     def check_keyword(keyword, arg, val_val=None, val_id=None, val_attr=None):
@@ -26,7 +29,7 @@ class SimplerTestCase(SimpleTestCase):
             return True
     
     def check_migration(self, migration_dir, model_name):
-        print(migration_dir, model_name)
+        # print(migration_dir, model_name)
         for file in os.listdir(migration_dir):
             full_path = os.path.join(migration_dir, file)
             (path, ext) = os.path.splitext(full_path)
