@@ -45,3 +45,19 @@ class SimplerTestCase(SimpleTestCase):
                 except:
                     pass
         return False
+
+    def check_for_comments(self, filename):
+        # Open file and read line by line
+        snippet_contents = []
+        with open(filename) as f:
+            snippet_contents = f.readlines()
+
+        comment_found = False
+        endcomment_found = False
+        for line in snippet_contents:
+            if '{% comment %}' in line:
+                comment_found = True
+            elif '{% endcomment %}' in line:
+                endcomment_found = True
+
+        return comment_found, endcomment_found

@@ -243,6 +243,15 @@ class PostTestCase(SimplerTestCase):
         self.assertTrue(self.get_absolute_url_post_found, msg="In `get_absolute_url()` the first argument in `reverse()` should be `'post'`.")
         self.assertTrue(self.get_absolute_url_args_correct, msg="In `get_absolute_url()` the second argument in `reverse()` should be `args=[str(self.id)]`.")
 
+    def test_task10_uncomment_templates(self):
+        # Remove `{% comment %}` and {% endcomment %} tags from 
+        # `templates/mainapp/snippet_post_list.html` & `templates/mainapp/post.html`
+        filename = 'mainapp/templates/mainapp/snippet_post_list.html'
+        comment_found, endcomment_found = SimplerTestCase.check_for_comments(self, filename)
+
+        self.assertTrue(not comment_found, msg="There is still a `{% comment %}` tag in `" + filename + "`")
+        self.assertTrue(not endcomment_found, msg="There is still an `{% endcomment %}` tag in `" + filename + "`")
+
     def test_task11_admin_register_tag(self):
         # from .models import BlogPost, Tag
         #   admin.site.register(Tag)
@@ -266,3 +275,8 @@ class PostTestCase(SimplerTestCase):
         
         self.assertTrue(import_Tag_found, msg="Did you import `Tag`?")
         self.assertTrue(admin_site_register_found, msg="Did you register the Tag model to the admin site?")
+
+    
+
+        
+        
