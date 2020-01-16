@@ -1,4 +1,4 @@
-import ast
+import ast, os
 from support.SimplerTestCase import SimplerTestCase
 
 class PostTestCase(SimplerTestCase):
@@ -247,7 +247,7 @@ class PostTestCase(SimplerTestCase):
         # Remove `{% comment %}` and {% endcomment %} tags from 
         # `templates/mainapp/snippet_post_list.html` & `templates/mainapp/post.html`
         filename = 'mainapp/templates/mainapp/snippet_post_list.html'
-        comment_found, endcomment_found = SimplerTestCase.check_for_comments(self, filename)
+        comment_found, endcomment_found = self.check_for_comments(filename)
 
         self.assertTrue(not comment_found, msg="There is still a `{% comment %}` tag in `" + filename + "`")
         self.assertTrue(not endcomment_found, msg="There is still an `{% endcomment %}` tag in `" + filename + "`")
@@ -276,6 +276,10 @@ class PostTestCase(SimplerTestCase):
         self.assertTrue(import_Tag_found, msg="Did you import `Tag`?")
         self.assertTrue(admin_site_register_found, msg="Did you register the Tag model to the admin site?")
 
+    def test_task12_make_migrations(self):
+        msg = "Did you use `manage.py makemigrations` to create the `Tag` migrations file? Don't forget to `add` it to the git repo."
+        self.assertTrue(os.path.isdir('mainapp/migrations/'), msg=msg)
+        self.assertTrue(self.check_migration('mainapp/migrations/', 'Tag'), msg=msg)
     
 
         
