@@ -1,7 +1,7 @@
 
 # Create Model class
 
-Create the blog post model by adding a new class into `mainapp/models.py`. Name the class `BlogPost` and make it extend `models.Model`. In the class body, add a field called `title` and set it to `models.CharField()`. Pass it a `max_length` of `200`.
+Create the blog post model by adding a new class into `mainapp/models.py`. Name the class `BlogPost` and make it extend `models.Model`. In the class body, add a field called `title` and set it to `models.CharField()`. Pass it a `max_length` of `200`. Optionally, you can also pass `unique=True` to require that each blog post has a unique title. You'll see this done in the answer video.
 
 ```python
 class BlogPost(models.Model):
